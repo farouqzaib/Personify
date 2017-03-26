@@ -1,2 +1,2 @@
 # Personify
-Personalization System
+Minimalist Personalization System
