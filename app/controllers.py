@@ -1,6 +1,7 @@
 from flask.views import MethodView
-from config import db
 from flask import request
+
+from services import EventService
 
 import json
 
@@ -29,4 +30,9 @@ class Events(MethodView):
 		if errors:
 			return json.dumps({'status': 'error', 'message': errors, 'code': 'P01'})
 
-		return 'creating an event'
+		try:
+			EventService.create(payload)
+		except Exception as e:
+			return json.dumps({'status': 'error', 'message': e.message})
+
+		return json.dumps({'status': 'success', 'data': payload})
