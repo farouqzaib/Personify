@@ -1,7 +1,7 @@
 from flask.views import MethodView
 from flask import request
 
-from services import EventService
+from config.service_locator import service_locator
 
 import json
 
@@ -31,7 +31,7 @@ class Events(MethodView):
 			return json.dumps({'status': 'error', 'message': errors, 'code': 'P01'})
 
 		try:
-			EventService.create(payload)
+			service_locator.get('eventService').create(payload)
 		except Exception as e:
 			return json.dumps({'status': 'error', 'message': e.message})
 
