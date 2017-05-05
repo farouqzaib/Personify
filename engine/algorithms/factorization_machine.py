@@ -13,6 +13,6 @@ class FactorizationMachine():
 		self.model.fit(sparse.csr_matrix(features), target)
 
 	def predict(self, features):
-		predictions = self.model.predict(sparse.csr_matrix(features))
+		return self.model.predict(sparse.csr_matrix(features))
 
 
