@@ -6,5 +6,5 @@ db = {
 }
 
 engine = {
-	'training_data_age': 100 #specifies in days how much data to be used for training
+	'training_data_age': 10000 #specifies in days how much data to be used for training
 }

@@ -4,11 +4,21 @@ from app.config import db
 from app.config.config import engine
 import datetime
 import numpy as np
+import pandas as pd
 
 class Engine:
 
+    def __init__(self):
+        self.users_to_int = {}
+        self.items_to_int = {}
+        self.users_to_int_counter = 0
+        self.items_to_int_counter = 0
+
     def load_data(self):
-        
+        '''
+            Loads the data from the data source
+        '''        
+
         today = datetime.datetime.today()
         query = {
             "range": {
@@ -18,17 +28,48 @@ class Engine:
                 }
             }
         }
-        res = db.es.search(index="events", body={"query": query})
+
+        #TODO investigate performance of scroll instead of fetching large records in one go
+        res = db.es.search(index="events", body={"query": query}, size=1000000)
         events = []
-        data = res["hits"]["hits"]  
+        data = res["hits"]["hits"]
+
+        # #check the dtype of the essential features
+        # first_record = record[0]["_source"]
+
+        # if type(first_record["user"]) == "string":
+        #     users_to_int = self.transform_feature_to_int()
+        
+        # if type(first_record["item"]) == "string":
+        #     items_to_int = self.transform_feature_to_int()
+
         for record in data:
-            event = record["_source"]
-            events.append((event["user"], event["item"], event["created_at"], event["quantity"]))
+            event = record["_source"]            
+            events.append((self.transform_feature_to_int(event["user"]), self.transform_feature_to_int(event["item"], "item"), event["rating"])
+            + self.apply_feature_engineering(event["created_at"], "date"))
         print np.array(events).shape
         return np.array(events)
 
-    def apply_feature_engineering(self):
-        pass
+    def transform_feature_to_int(self, feature, type='user'):
+        '''
+            Assigns a unique integer to an element in a feature
+        '''
+        if type == 'user':
+            if feature not in self.users_to_int:
+                self.users_to_int[feature] = self.users_to_int_counter
+                self.users_to_int_counter += 1
+            return self.users_to_int_counter
+        
+        else:
+            if feature not in self.items_to_int:
+                self.items_to_int[feature] = self.items_to_int_counter
+                self.items_to_int_counter += 1
+            return self.items_to_int_counter
+
+    def apply_feature_engineering(self, feature, type="date"):
+        if type == "date":
+            transformed_feature = pd.to_datetime(feature)
+            return (transformed_feature.year, transformed_feature.month, transformed_feature.day)
 
     def train(self):
         fm = FactorizationMachine()

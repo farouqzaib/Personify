@@ -27,7 +27,7 @@ class Events(MethodView):
 		if 'created_at' not in payload:
 			errors.append('Event must be associated with a date and time')
 		
-		if 'quantity' not in payload:
+		if 'action' == 'buy':
 			payload["quantity"] = 1
 
 		if errors:
