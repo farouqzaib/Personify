@@ -5,6 +5,7 @@ from app.config.config import engine
 import datetime
 import numpy as np
 import pandas as pd
+import pickle
 
 class Engine:
 
@@ -72,15 +73,26 @@ class Engine:
             return (transformed_feature.year, transformed_feature.month, transformed_feature.day)
 
     def train(self):
-        fm = FactorizationMachine()
+        self.fm = FactorizationMachine()
         events = self.load_data()
         features = events[:, 0:events.shape[1] - 1] #means to select every data in every row for the first and second to last column
         target = events[:, -1] #selects every data in every row for the last column
-        fm.fit(features, target)
+        self.fm.fit(features, target)
+        self.save_model()
 
     def get_recommendations(self):
-        fm.predict(features)
+        self.fm.predict(features)
     
     def save_recommendations(self):
         pass
         
+    def save_model(self):
+        '''
+            Saves the trained model to disk
+        '''
+        f = open('engine/models/model-{0}.fm'.format(datetime.datetime.today()), 'w')
+        pickle.dump(self.fm, f)
+
+    
+    def load_model(self):
+        pass
