@@ -31,7 +31,7 @@ class Engine:
         }
 
         #TODO investigate performance of scroll instead of fetching large records in one go
-        res = db.es.search(index="events", body={"query": query}, size=1000000)
+        res = db.es.search(index="events", body={"query": query}, size=100)
         events = []
         data = res["hits"]["hits"]
 
@@ -90,8 +90,11 @@ class Engine:
         '''
             Saves the trained model to disk
         '''
-        f = open('engine/models/model-{0}.fm'.format(datetime.datetime.today()), 'w')
+        today = datetime.datetime.today()
+        file_name = 'models/model-{0}.fm'.format(today)
+        f = open('engine/{0}'.format(file_name), 'w')
         pickle.dump(self.fm, f)
+        res = db.es.index(index="events", doc_type='models', id='', body={'model': file_name, 'created_at': today})
 
     
     def load_model(self):
