@@ -31,7 +31,7 @@ class Engine:
         }
 
         #TODO investigate performance of scroll instead of fetching large records in one go
-        res = db.es.search(index="events", body={"query": query}, size=100)
+        res = db.es.search(index="events", doc_type="event", body={"query": query}, size=100)
         events = []
         data = res["hits"]["hits"]
 
