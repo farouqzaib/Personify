@@ -4,7 +4,7 @@ elasticsearch==5.2.0
 fastFM==0.2.9
 Flask==0.12
 itsdangerous==0.24
-Jinja2==2.9.5
+Jinja2==2.11.3
 MarkupSafe==1.0
 numpy==1.12.1
 packaging==16.8
